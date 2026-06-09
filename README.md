@@ -185,7 +185,11 @@ OPENAI_API_KEY=sk-xxx
 # ── 方案 F：Anthropic ────────────────────────────────
 ANTHROPIC_API_KEY=sk-ant-xxx
 
-# ── 方案 G：Kimi（Anthropic 兼容 API）────────────────
+# ── 方案 G：MiMo（小米）──────────────────────────────
+MIMO_API_KEY=sk-xxx
+# 申请地址：https://platform.xiaomimimo.com/
+
+# ── 方案 H：Kimi（Anthropic 兼容 API）────────────────
 ANTHROPIC_AUTH_TOKEN=your-kimi-token
 ```
 
@@ -209,6 +213,14 @@ config = {
 #     "llm_provider": "deepseek",
 #     "deep_think_llm": "deepseek-chat",
 #     "quick_think_llm": "deepseek-chat",
+#     "output_language": "Chinese",
+# }
+
+# ── MiMo（小米）示例 ────────────────────────────────
+# config = {
+#     "llm_provider": "mimo",
+#     "deep_think_llm": "mimo-v2.5-pro",
+#     "quick_think_llm": "mimo-v2-flash",
 #     "output_language": "Chinese",
 # }
 
@@ -247,13 +259,16 @@ tradingagents-web
 
 # 方式二：直接运行
 streamlit run web/app.py
+
+# 方式三：若 pip install -e . 报错，手动设置 PYTHONPATH
+PYTHONPATH=. python -m streamlit run web/app.py
 ```
 
 打开浏览器访问 `http://localhost:8501`。
 
 ### 功能
 
-- **模型自选**：侧边栏支持 9 个 LLM 供应商切换（MiniMax/DeepSeek/Qwen/GLM/OpenAI/Anthropic/Google/xAI/Ollama）
+- **模型自选**：侧边栏支持 10 个 LLM 供应商切换（MiniMax/MiMo/DeepSeek/Qwen/GLM/OpenAI/Anthropic/Google/xAI/Ollama）
 - **一键分析**：输入 6 位 A 股代码 + 日期，点击「开始分析」
 - **实时进度**：12 阶段 pipeline 实时显示（7 分析师 → 质量门控 → 辩论 → 风控 → 决策），所有已完成阶段的报告均可展开查看
 - **完整报告**：信号卡片（Buy/Hold/Sell）、7 份分析师报告、多空辩论、风控评估
@@ -274,7 +289,7 @@ streamlit run web/app.py
 
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
-| `llm_provider` | `"minimax"` | LLM 提供商：`minimax` / `deepseek` / `qwen` / `glm` / `openai` / `anthropic` / `google` / `xai` / `ollama` |
+| `llm_provider` | `"minimax"` | LLM 提供商：`minimax` / `mimo` / `deepseek` / `qwen` / `glm` / `openai` / `anthropic` / `google` / `xai` / `ollama` |
 | `deep_think_llm` | `"MiniMax-M2.7"` | Research Manager + Portfolio Manager 用的模型 |
 | `quick_think_llm` | `"MiniMax-M2.7-highspeed"` | 所有 Analyst / Researcher / Trader 用的模型 |
 | `backend_url` | `None` | 自定义 API 端点 / 第三方中转网关。可在 Web UI 侧边栏填写，或用 `.env` 的 `BACKEND_URL`；方便国内通过代理访问 Claude / OpenAI |
@@ -290,7 +305,7 @@ streamlit run web/app.py
 ## 常见问题排错
 
 **Q: 用 DeepSeek/通义/智谱，却报 `OpenAIError: The api_key client option must be set ... OPENAI_API_KEY`？**
-每个供应商用**各自的环境变量**，不是 OPENAI_API_KEY：DeepSeek=`DEEPSEEK_API_KEY`、通义=`DASHSCOPE_API_KEY`、智谱=`ZHIPU_API_KEY`、MiniMax=`MINIMAX_API_KEY`、xAI=`XAI_API_KEY`、OpenRouter=`OPENROUTER_API_KEY`。在项目根目录 `.env` 里设置对应变量后**重启**程序。（v0.2.12 起缺 key 会直接提示该用哪个变量名。）
+每个供应商用**各自的环境变量**，不是 OPENAI_API_KEY：DeepSeek=`DEEPSEEK_API_KEY`、通义=`DASHSCOPE_API_KEY`、智谱=`ZHIPU_API_KEY`、MiniMax=`MINIMAX_API_KEY`、MiMo=`MIMO_API_KEY`、xAI=`XAI_API_KEY`、OpenRouter=`OPENROUTER_API_KEY`。在项目根目录 `.env` 里设置对应变量后**重启**程序。（v0.2.12 起缺 key 会直接提示该用哪个变量名。）
 
 **Q: 导出 PDF 报 `UnicodeEncodeError: 'latin-1' codec can't encode`？**
 你的环境里装了**旧版 `fpdf`（pyfpdf）**，它和本项目用的 `fpdf2` 都以 `fpdf` 名称导入、互相冲突。执行：`pip uninstall -y fpdf && pip install "fpdf2>=2.8.0"`。实在不行可改用「下载 Markdown」导出（零依赖，永远可用）。
